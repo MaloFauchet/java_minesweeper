@@ -13,15 +13,17 @@ public class Algo {
         algo_grid = new int[size[0]][size[1]];
         game_grid = new int[size[0]][size[1]];
 
-        initGrid();
+        initGrid(algo_grid, 0);
+        initGrid(game_grid, EMPTY_CELL);
         plantMine();
-        printGrid();
+        printGrid(algo_grid);
+        printGrid(game_grid);
     }
 
-    public void initGrid() {
+    public void initGrid(int[][] grid, int value) {
         for (int i = 0; i < size[0]; i++) {
             for (int j = 0; j < size[1]; j++) {
-                algo_grid[i][j] = 0;
+                grid[i][j] = value;
             }
         }
     }
@@ -40,7 +42,7 @@ public class Algo {
         }
     }
 
-    public void printGrid() {
+    public void printGrid(int[][] grid) {
         for (int i = 0; i < size[0]; i++) {
             if (i==0) {
                 System.out.println("   |  0. 1. 2. 3. 4. 5. 6. 7. 8. 9.");
@@ -50,7 +52,11 @@ public class Algo {
                 if (j == 0) {
                     System.out.print(i+". |");
                 }
-                System.out.format("%3d", algo_grid[i][j]);
+                if (grid[i][j] > 8) {
+                    System.out.format("%3c", grid[i][j]);
+                } else {
+                    System.out.format("%3d", grid[i][j]);
+                }
             }
             System.out.println();
         }
