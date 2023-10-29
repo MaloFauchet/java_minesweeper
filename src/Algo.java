@@ -1,5 +1,3 @@
-import java.util.Arrays;
-
 public class Algo {
     int[] size;  // size of the grid. first is num of rows. second is num of columns
     int mine_number;  // number of mines
