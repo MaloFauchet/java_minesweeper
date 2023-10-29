@@ -4,7 +4,11 @@ public class Algo {
     int[] size;  // size of the grid. first is num of rows. second is num of columns
     int mine_number;  // number of mines
     int[][] algo_grid;  // the algo grid. contains mine positions && the numbers of mines next to a case
-    int[][] game_grid;  // the game grid. the one printed && updated in function of user input
+    int[][] game_grid;  // the game grid. the one printed and updated in function of user input
+    int[] position_checked;  // contains all the case already discovered. 0 : x0, 1: y0;  2: x1, 3: y1...
+    int position_checked_index;  // index of the last x in position_checked
+    int input_x;
+    int input_y;
 
 
     public Algo(int[] grid_size, int p_mine_number){
@@ -12,12 +16,13 @@ public class Algo {
         mine_number = p_mine_number;
         algo_grid = new int[size[0]][size[1]];
         game_grid = new int[size[0]][size[1]];
+        position_checked = new int[size[0]*size[1] *2];
+        position_checked_index = 0;
 
         initGrid(algo_grid, 0);
         initGrid(game_grid, EMPTY_CELL);
         plantMine();
         getMineAround();
-        printGrid(algo_grid);
     }
 
     public void initGrid(int[][] grid, int value) {
@@ -44,7 +49,6 @@ public class Algo {
 
     public void getMineAround(){
         int len_i = size[0] - 1;
-        int len_j = size[1] - 1;
         for (int i = 0; i < size[0]; i++) {
             for (int j = 0; j < size[1]; j++) {
                 // skip if it contains a mine
@@ -78,6 +82,60 @@ public class Algo {
         }
     }
 
+    public void discoverCaseAround(int x, int y) {
+        if (isInPositionChecked(x, y))
+            return;
+
+        position_checked_index += 2;
+        position_checked[position_checked_index] = x;
+        position_checked[position_checked_index+1] = y;
+
+        int case_value = algo_grid[y][x];
+
+        if (case_value == 0) {
+            // check up
+            if (y != 0) {
+                discoverCaseAround(x, y-1);
+                //check up left
+                if (x != 0)
+                    discoverCaseAround(x-1, y-1);
+                //check up right
+                if (x != size[0]-1)
+                    discoverCaseAround(x+1, y-1);
+            }
+
+            // check left
+            if (x != 0)
+                discoverCaseAround(x-1, y);
+            //check right
+            if (x != size[0]-1)
+                discoverCaseAround(x+1, y);
+
+            // check down
+            if (y != size[1]-1) {
+                discoverCaseAround(x, y+1);
+                //check down left
+                if (x != 0)
+                    discoverCaseAround(x-1, y+1);
+                if (x != size[0]-1)
+                    discoverCaseAround(x+1, y+1);
+            }
+        }
+        updatePosition(x, y);
+    }
+
+    public boolean isInPositionChecked(int x, int y) {
+        for (int i = 0; i < position_checked_index; i+=2) {
+            if (position_checked[i]==x && position_checked[i+1]==y)
+                return true;
+        }
+        return false;
+    }
+
+    public void updatePosition(int x, int y) {
+        game_grid[y][x] = algo_grid[y][x];
+    }
+
     public void printGrid(int[][] grid) {
         for (int i = 0; i < size[0]; i++) {
             if (i==0) {
@@ -98,7 +156,7 @@ public class Algo {
         }
     }
 
-    // return a r&&om number between 0 && max_num(excluded)
+    // return a random int between 0 and max_num(excluded)
     private static int getRandomInt(int max_num) {
         return (int)(Math.random() * (max_num));
     }
